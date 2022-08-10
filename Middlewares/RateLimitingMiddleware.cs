@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
+using throttling.Extensions;
+using throttling.Models;
 
-namespace throttling
+namespace throttling.Middlewares
 {
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
 
@@ -76,59 +76,6 @@ namespace throttling
                 await _cache.SetCahceValueAsync<ClientStatistics>(key, clientStatistics);
             }
 
-        }
-    }
-
-    public class ClientStatistics
-    {
-        public DateTime LastSuccessfulResponseTime { get; set; }
-        public int NumberOfRequestsCompletedSuccessfully { get; set; }
-    }
-
-    // Extension method used to add the middleware to the HTTP request pipeline.
-    public static class RateLimitingMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseRateLimitingMiddleware(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<RateLimitingMiddleware>();
-        }
-    }
-
-    public static class DistributedCachingExtensions
-    {
-        public async static Task SetCahceValueAsync<T>(this IDistributedCache distributedCache, string key, T value, CancellationToken token = default(CancellationToken))
-        {
-            await distributedCache.SetAsync(key, value.ToByteArray(), token);
-        }
-
-        public async static Task<T> GetCacheValueAsync<T>(this IDistributedCache distributedCache, string key, CancellationToken token = default(CancellationToken)) where T : class
-        {
-            var result = await distributedCache.GetAsync(key, token);
-            return result.FromByteArray<T>();
-        }
-    }
-
-
-    public static class Serialization
-    {
-        public static byte[] ToByteArray(this object objectToSerialize)
-        {
-            if (objectToSerialize == null)
-            {
-                return null;
-            }
-
-            return Encoding.Default.GetBytes(JsonConvert.SerializeObject(objectToSerialize));
-        }
-
-        public static T FromByteArray<T>(this byte[] arrayToDeserialize) where T : class
-        {
-            if (arrayToDeserialize == null)
-            {
-                return default(T);
-            }
-
-            return JsonConvert.DeserializeObject<T>(Encoding.Default.GetString(arrayToDeserialize));
         }
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using throttling.Models;
 
 namespace throttling.Controllers
 {

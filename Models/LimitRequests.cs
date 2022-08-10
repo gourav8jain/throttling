@@ -1,4 +1,4 @@
-﻿namespace throttling
+﻿namespace throttling.Models
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class LimitRequests : Attribute
